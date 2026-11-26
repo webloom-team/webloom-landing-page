@@ -221,6 +221,7 @@
         if (panel) {
           if (!panel.id) panel.id = "panel-" + Math.random().toString(36).slice(2, 8);
           button.setAttribute("aria-controls", panel.id);
+          panel.setAttribute("role", "tabpanel");
           panel.setAttribute("aria-labelledby", button.id);
         }
         button.addEventListener("click", function () {
