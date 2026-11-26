@@ -2221,7 +2221,7 @@ section[id] {
   background: currentColor;
   content: "";
   transform: translate(-50%, -50%);
-  transition: transform 180ms ease;
+  transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .faq-icon::after {
@@ -2230,6 +2230,10 @@ section[id] {
 
 .faq-item[open] .faq-icon::after {
   transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.faq-item.is-closing .faq-icon::after {
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 
 .faq-item p {
@@ -3018,5 +3022,10 @@ body.dialog-open {
   .demo-lead--new,
   .project-dialog[open] {
     animation: none;
+  }
+
+  .faq-icon::before,
+  .faq-icon::after {
+    transition: none;
   }
 }

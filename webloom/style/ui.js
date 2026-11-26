@@ -153,6 +153,87 @@
     });
   }
 
+  function initFaq() {
+    document.querySelectorAll(".faq-item").forEach(function (details) {
+      var summary = details.querySelector("summary");
+      var answer = details.querySelector("p");
+      if (!summary || !answer) return;
+
+      var open = details.open;
+      var animation = null;
+      var naturalPadding = parseFloat(window.getComputedStyle(answer).paddingBottom) || 0;
+
+      summary.addEventListener("click", function (event) {
+        event.preventDefault();
+
+        var wasVisible = details.open;
+        var fromHeight = wasVisible ? answer.getBoundingClientRect().height : 0;
+        var fromOpacity = wasVisible ? parseFloat(window.getComputedStyle(answer).opacity) || 1 : 0;
+        var fromPadding = wasVisible ? parseFloat(window.getComputedStyle(answer).paddingBottom) || 0 : 0;
+        open = !open;
+
+        if (animation) {
+          animation.cancel();
+          animation = null;
+        }
+
+        if (reduceMotion || typeof answer.animate !== "function") {
+          details.open = open;
+          details.classList.remove("is-closing");
+          answer.style.height = "";
+          answer.style.opacity = "";
+          answer.style.overflow = "";
+          answer.style.paddingBottom = "";
+          return;
+        }
+
+        if (open) {
+          details.open = true;
+          details.classList.remove("is-closing");
+        } else {
+          details.classList.add("is-closing");
+        }
+
+        var toHeight = 0;
+        if (open) {
+          var currentPadding = parseFloat(window.getComputedStyle(answer).paddingBottom) || 0;
+          toHeight = answer.scrollHeight - currentPadding + naturalPadding;
+        }
+
+        answer.style.overflow = "hidden";
+        answer.style.height = fromHeight + "px";
+        answer.style.opacity = String(fromOpacity);
+        answer.style.paddingBottom = fromPadding + "px";
+
+        var current = answer.animate(
+          [
+            { height: fromHeight + "px", paddingBottom: fromPadding + "px", opacity: fromOpacity },
+            { height: toHeight + "px", paddingBottom: (open ? naturalPadding : 0) + "px", opacity: open ? 1 : 0 }
+          ],
+          {
+            duration: 220,
+            easing: "cubic-bezier(0.2, 0.7, 0.2, 1)",
+            fill: "both"
+          }
+        );
+        animation = current;
+
+        current.onfinish = function () {
+          current.cancel();
+          if (!open) {
+            details.open = false;
+            details.classList.remove("is-closing");
+          }
+          answer.style.height = "";
+          answer.style.opacity = "";
+          answer.style.overflow = "";
+          answer.style.paddingBottom = "";
+          animation = null;
+        };
+      });
+    });
+  }
+
   function initActiveNav() {
     var links = Array.prototype.slice.call(document.querySelectorAll("[data-nav-link]"));
     if (!links.length || !("IntersectionObserver" in window)) return;
@@ -382,6 +463,7 @@
     initHeader();
     initNav();
     initReveal();
+    initFaq();
     initActiveNav();
     initTabs();
     initLeadDemo();
